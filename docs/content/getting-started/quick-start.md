@@ -61,12 +61,21 @@ tori serve $HOME/data/tori/x/karpathy
 ## 4. Go deeper, then keep it fresh
 
 The recent timeline is only a slice.
-To capture a profile's fuller history, walk monthly search windows.
-Bound the range with `--since` so a free-tier run stays under X's search rate limit:
+To capture a profile's fuller history, walk monthly search windows with `--by-month`.
+Bound the range with `--since` so a free guest-tier run stays under X's search rate limit:
 
 ```bash
 tori archive karpathy --guest --by-month --since 2025-01-01
 ```
+
+For the complete history, back to the first post, import a session and drop the bound.
+A session has the search headroom the guest tier lacks, and `--with-replies` keeps the author's self-threads whole:
+
+```bash
+tori archive karpathy --by-month --with-replies
+```
+
+See [archiving a profile](/guides/archiving-a-profile/) for the full-history details.
 
 Later, re-run with `tori add` to fetch only what is new since the last capture and re-render the views:
 

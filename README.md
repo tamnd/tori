@@ -96,21 +96,25 @@ tori archive karpathy --guest --with-replies --with-retweets
 ```
 
 X caps a timeline at roughly the last 3200 posts however you page it.
-To reach past that, `--by-month` walks the history in monthly `from:<handle> since:.. until:..` search windows, newest first, and stitches the results into one repository.
-`--since` and `--until` bound the range:
+To reach past that, `--by-month` walks the history in monthly `from:<handle> since:.. until:..` search windows, newest first, from the account's creation to now, and stitches the results into one repository.
 
 ```bash
+# The whole history, back to the account's first post (import a session first)
+tori archive karpathy --by-month --with-replies
+
 # Everything since the start of 2025
-tori archive karpathy --guest --by-month --since 2025-01-01
+tori archive karpathy --by-month --since 2025-01-01
 
 # A specific year
-tori archive karpathy --guest --by-month --since 2024-01-01 --until 2025-01-01
+tori archive karpathy --by-month --since 2024-01-01 --until 2025-01-01
 ```
 
-One honest caveat: on the free guest tier, X rate-limits search hard.
-A long unbounded `--by-month` run will eventually hit a 429 with a multi-minute reset, which the engine waits out (the process looks paused, then resumes).
-A bounded run with `--since` completes comfortably.
-For heavy full-history work, import a session (next section), which has far more search headroom.
+For a complete history, use a session (the next section), not `--guest`.
+The guest tier rate-limits search hard: a long unbounded `--by-month` run hits a 429 with a multi-minute reset, which the engine waits out (the process looks paused, then resumes), so it crawls.
+A session has far more search headroom and walks the full history in one sitting; `--guest` is best kept for bounded runs with `--since`.
+
+Add `--with-replies` for a faithful full archive.
+A self-thread (the author replying to their own post to continue it) is stored by X as a reply, so without the flag the by-month walk keeps only the standalone posts and drops the rest of every thread.
 tori is incremental and resumable throughout: hit Ctrl-C and it keeps what it already wrote; run `tori add` later and it fetches only newer posts.
 
 The flags you'll actually reach for:
