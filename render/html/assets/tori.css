@@ -1,0 +1,91 @@
+/* tori archive stylesheet — inert, self-contained, system fonts only. No remote
+   fonts, no analytics, no script. A photograph of X, not a running app. */
+
+:root {
+  --bg: #ffffff;
+  --fg: #0f1419;
+  --muted: #536471;
+  --accent: #1d9bf0;
+  --border: #eff3f4;
+  --card: #ffffff;
+  --hover: #f7f9f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --fg: #e7e9ea;
+    --muted: #71767b;
+    --accent: #1d9bf0;
+    --border: #2f3336;
+    --card: #16181c;
+    --hover: #16181c;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.wrap { max-width: 620px; margin: 0 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 100vh; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+header.profile { border-bottom: 1px solid var(--border); }
+.banner { width: 100%; aspect-ratio: 3 / 1; object-fit: cover; display: block; background: var(--border); }
+.profile-body { padding: 12px 16px; }
+.profile-body .avatar { width: 80px; height: 80px; border-radius: 50%; margin-top: -40px; border: 4px solid var(--bg); background: var(--bg); }
+.profile-body h1 { font-size: 20px; margin: 6px 0 0; }
+.profile-body .handle { color: var(--muted); }
+.profile-body .bio { margin: 10px 0; }
+.profile-body .stats { color: var(--muted); display: flex; gap: 18px; flex-wrap: wrap; }
+.profile-body .stats b { color: var(--fg); }
+
+.tweet { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.tweet:hover { background: var(--hover); }
+.tweet .row { display: flex; gap: 12px; }
+.tweet .avatar { width: 48px; height: 48px; border-radius: 50%; flex: 0 0 48px; background: var(--border); }
+.tweet .body { flex: 1 1 auto; min-width: 0; }
+.tweet .author { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+.tweet .author .name { font-weight: 700; }
+.tweet .author .at, .tweet .author .time { color: var(--muted); }
+.tweet .author .onx { font-size: 12px; }
+.tweet .author .onx a { color: var(--muted); }
+.verified { color: var(--accent); font-weight: 700; }
+.tweet .text { margin: 4px 0; white-space: pre-wrap; word-wrap: break-word; }
+.retweet-marker, .reply-marker { color: var(--muted); font-size: 13px; margin-bottom: 2px; }
+
+.media { display: grid; gap: 8px; margin: 10px 0; border-radius: 16px; overflow: hidden; }
+.media.n1 { grid-template-columns: 1fr; }
+.media.n2 { grid-template-columns: 1fr 1fr; }
+.media.n3, .media.n4 { grid-template-columns: 1fr 1fr; }
+.media img, .media video { width: 100%; height: 100%; object-fit: cover; display: block; border: 1px solid var(--border); border-radius: 12px; }
+.media .unavail { padding: 24px; text-align: center; color: var(--muted); border: 1px dashed var(--border); border-radius: 12px; }
+
+.quote { border: 1px solid var(--border); border-radius: 16px; padding: 10px 12px; margin: 10px 0; }
+.quote .author { font-size: 14px; }
+.quote .text { font-size: 14px; white-space: pre-wrap; word-wrap: break-word; }
+
+.poll { margin: 10px 0; }
+.poll .opt { position: relative; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; margin: 4px 0; overflow: hidden; }
+.poll .bar { position: absolute; inset: 0; background: var(--border); z-index: 0; }
+.poll .opt span { position: relative; z-index: 1; }
+.poll .pct { float: right; color: var(--muted); }
+.poll .status { color: var(--muted); font-size: 13px; }
+
+.metrics { display: flex; gap: 18px; color: var(--muted); font-size: 13px; margin-top: 8px; }
+
+.thread .tweet { border-left: 2px solid var(--border); }
+.thread .tweet.root { border-left: 2px solid var(--accent); }
+
+footer.repo { padding: 16px; color: var(--muted); font-size: 13px; text-align: center; }
+nav.top { padding: 10px 16px; border-bottom: 1px solid var(--border); font-weight: 700; }
+nav.top a { color: var(--fg); }
