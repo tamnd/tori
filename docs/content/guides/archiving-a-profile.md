@@ -31,11 +31,15 @@ A profile timeline caps out around 3200 tweets no matter how deep you page.
 To get past that, `--by-month` ignores the timeline and instead walks monthly `from:<handle> since:<date> until:<date>` search windows from the account's creation to now, stitching the results into one archive:
 
 ```bash
-tori archive karpathy --guest --by-month
+tori archive karpathy --by-month --with-replies
 ```
 
 Each window is a separate search, so the cap never applies.
 A bad window (one that errors) is logged and skipped rather than aborting the whole run.
+
+Two flags make the difference between a partial and a faithful full history.
+Use a session, not `--guest`, so the walk does not stall on the search rate limit (see below).
+Add `--with-replies` so the author's self-threads survive, since X stores each follow-on post in a thread as a reply (see [Replies and retweets](#replies-and-retweets)).
 
 ## Bounding the range
 
@@ -67,7 +71,7 @@ Two ways to handle it:
 
   ```bash
   tori auth import --auth-token <...> --ct0 <...>
-  tori archive karpathy --by-month
+  tori archive karpathy --by-month --with-replies
   ```
 
 If a run does hit the limit, tori exits with code 5 (blocked or rate-limited) and the partial archive is on disk.
@@ -79,8 +83,12 @@ By default a profile capture keeps original posts and drops replies and retweets
 Add them back when you want the full conversation footprint:
 
 ```bash
-tori archive karpathy --guest --with-replies --with-retweets
+tori archive karpathy --with-replies --with-retweets
 ```
+
+`--with-replies` is worth a second look for a full archive.
+A self-thread, where the author replies to their own post to continue a longer point, is stored by X as a reply, so the default capture keeps only the opening post and drops the continuation.
+Pass `--with-replies` to keep whole threads intact.
 
 To keep only posts that carry media, add `--media-only`.
 
