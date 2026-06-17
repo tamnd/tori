@@ -1,0 +1,10 @@
+title       = "tori"
+baseURL     = "https://tori.tamnd.com/"
+description = "tori (鳥, bird) builds offline, browsable archives of X (Twitter) content. It captures tweets, threads, and whole profiles through the free x-cli engine and writes a self-contained repository of canonical JSON with derived HTML and Markdown views you can read with the network unplugged."
+contentDir  = "content"
+outputDir   = "public"
+theme       = "tago-doks"
+syntaxHighlight = "true"
+
+[params]
+github = "https://github.com/tamnd/tori"
