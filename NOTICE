@@ -1,0 +1,38 @@
+tori — an offline archive of X (Twitter).
+
+tori captures a corner of X — a profile, a thread, a search, your bookmarks or
+likes — into a self-contained, offline-browsable repository: every tweet as a
+record, the media localised, rendered into a static site and into Markdown,
+with the original JSON kept beside each record as the source of truth.
+
+tori builds its reads on the scraping engine of x (https://github.com/tamnd/x-cli),
+which it imports directly: the no-auth syndication path, the guest- and
+session-token GraphQL tiers, the one legacy tweet/user parser, the normalized
+data model, the shared HTTP client, and the session store. It adds only the
+archive-shaped pieces x never needed — media localisation, conversation
+assembly, and the HTML and Markdown renderers.
+
+x derives from Nitter (https://github.com/zedeus/nitter), in particular its
+approach to X's web-client GraphQL API: the hardcoded public web bearer token,
+the versioned GraphQL operation/query-id map, the guest-token activation flow,
+the variables/features request shape, cursor pagination, and the shared
+"legacy" tweet/user JSON model.
+
+Nitter is licensed under the GNU Affero General Public License v3.0 only
+(AGPL-3.0-only). Because x is a derivative work it is released under the same
+license, and because tori links x's engine it is in turn a derivative work and
+is released under the same license.
+
+  Nitter — Copyright (C) 2019-2024 zedeus and Nitter contributors
+  x       — Copyright (C) 2026 Duc-Tam Nguyen
+  tori    — Copyright (C) 2026 Duc-Tam Nguyen
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, version 3.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+The full license text is in the file LICENSE.

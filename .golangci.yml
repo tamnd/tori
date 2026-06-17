@@ -1,0 +1,12 @@
+# Writes to stdout and stderr are the CLI's whole job, and a failed write to a
+# closed pipe is nothing a command-line tool can usefully recover from. errcheck
+# already ignores the fmt.Fprint* writes to a bytes.Buffer or strings.Builder
+# (which never error); this extends that to the io.Writer the commands print to.
+version: "2"
+linters:
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln

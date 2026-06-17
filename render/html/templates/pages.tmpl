@@ -1,0 +1,31 @@
+{{define "index"}}{{template "layout" .}}{{end}}
+{{define "tweetpage"}}{{template "layout" .}}{{end}}
+{{define "threadpage"}}{{template "layout" .}}{{end}}
+
+{{define "content"}}
+{{if .Profile}}{{template "profileheader" .Profile}}{{end}}
+{{if .Heading}}<div class="tweet"><div class="body"><h1>{{.Heading}}</h1>{{if .SubHeading}}<div class="handle">{{.SubHeading}}</div>{{end}}</div></div>{{end}}
+{{if .Single}}
+  {{if .IsThread}}<div class="thread">{{range .Cards}}{{template "tweetcard" .}}{{end}}</div>
+  {{else}}{{template "tweetcard" .SingleCard}}{{end}}
+{{else}}
+  {{range .Cards}}{{template "tweetcard" .}}{{end}}
+{{end}}
+{{end}}
+
+{{define "profileheader"}}
+<header class="profile">
+  {{if .BannerSrc}}<img class="banner" src="{{.BannerSrc}}" alt="banner" loading="lazy">{{end}}
+  <div class="profile-body">
+    {{if .AvatarSrc}}<img class="avatar" src="{{.AvatarSrc}}" alt="{{.Name}} avatar">{{end}}
+    <h1>{{.Name}}{{if .Verified}} <span class="verified" title="verified">✓</span>{{end}}</h1>
+    <div class="handle">@{{.Handle}}</div>
+    {{if .Bio}}<div class="bio">{{.Bio}}</div>{{end}}
+    <div class="stats">
+      <span><b>{{count .Following}}</b> Following</span>
+      <span><b>{{count .Followers}}</b> Followers</span>
+      {{if gt .Tweets 0}}<span><b>{{count .Tweets}}</b> Posts</span>{{end}}
+    </div>
+  </div>
+</header>
+{{end}}

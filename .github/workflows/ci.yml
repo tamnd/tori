@@ -1,0 +1,121 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# Cancel an in-flight run when a branch is pushed again.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Build and test on Linux and macOS with the race detector on. gofmt and vet
+  # run here too so a formatting slip fails fast on both platforms. Every test is
+  # pure Go with no network, so there is nothing to install first.
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -s -l .)
+          if [ -n "$unformatted" ]; then
+            echo "These files need gofmt -s -w:"
+            echo "$unformatted"
+            exit 1
+          fi
+      - name: go vet
+        run: go vet ./...
+      - name: build
+        run: go build ./...
+      - name: test
+        run: go test -race -count=1 -coverprofile=coverage.out ./...
+      - name: coverage summary
+        if: matrix.os == 'ubuntu-latest'
+        run: go tool cover -func=coverage.out | tail -1
+
+  # golangci-lint bundles staticcheck, govet, ineffassign, errcheck, unused and
+  # more, so it is the main quality gate.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
+      - uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+
+  # Scan the module and its dependencies for known vulnerabilities.
+  govulncheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
+  # Confirm go.mod and go.sum are tidy: a PR that adds an import without running
+  # go mod tidy fails here instead of breaking a later release.
+  tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
+      - name: go mod tidy is clean
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+
+  # tori is AGPL-3.0-only because it links the x-cli engine, which is AGPL (it
+  # derives from nitter). The allow-list therefore includes AGPL-3.0 alongside
+  # the permissive licenses the rest of the dependency tree carries. A
+  # dependency under a license not on this list fails the job, so a copyleft
+  # surprise is caught in CI rather than at release.
+  licenses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
+      - name: go-licenses check
+        run: |
+          go install github.com/google/go-licenses@latest
+          # modernc.org/mathutil (a transitive dep of the pure-Go sqlite the
+          # engine uses) is BSD-3-Clause and ships a LICENSE file, but the
+          # go-licenses classifier cannot read modernc's license text with
+          # enough confidence and reports it unknown. It is on the allow-list in
+          # spirit; ignore the one module the classifier chokes on.
+          go-licenses check ./... \
+            --ignore=modernc.org/mathutil \
+            --allowed_licenses=AGPL-3.0,Apache-2.0,MIT,BSD-2-Clause,BSD-3-Clause,ISC,MPL-2.0,Unlicense,BSD-3-Clause-Clear

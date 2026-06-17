@@ -1,0 +1,43 @@
+{{define "tweetcard"}}
+<article class="tweet{{if .Root}} root{{end}}" id="t{{.View.ID}}">
+  {{with .View}}
+  {{if .IsRetweet}}<div class="retweet-marker">🔁 {{.Handle}} reposted</div>{{end}}
+  {{if .IsReply}}<div class="reply-marker">↩ Replying to {{if .ReplyToRel}}<a href="{{.ReplyToRel}}">@{{.ReplyToUser}}</a>{{else}}@{{.ReplyToUser}}{{end}}</div>{{end}}
+  <div class="row">
+    {{if .AvatarSrc}}<img class="avatar" src="{{.AvatarSrc}}" alt="{{.AuthorName}} avatar" loading="lazy">{{else}}<div class="avatar"></div>{{end}}
+    <div class="body">
+      <div class="author">
+        <span class="name">{{.AuthorName}}</span>{{if .Verified}}<span class="verified" title="verified">✓</span>{{end}}
+        <span class="at">@{{.Handle}}</span>
+        <span class="time">· <a class="time" href="{{if .Permalink}}{{.Permalink}}{{else}}{{.URL}}{{end}}">{{.Stamp}}</a></span>
+        {{if .URL}}<span class="onx"><a href="{{.URL}}" rel="nofollow noopener">on X ↗</a></span>{{end}}
+      </div>
+      <div class="text">{{.HTMLBody}}</div>
+      {{template "mediablock" .}}
+      {{template "pollblock" .}}
+      {{with .Quoted}}{{template "quoteblock" .}}{{end}}
+      <div class="metrics">
+        <span title="replies">💬 {{count .Metrics.Replies}}</span>
+        <span title="reposts">🔁 {{count .Metrics.Retweets}}</span>
+        <span title="likes">♥ {{count .Metrics.Likes}}</span>
+        {{if gt .Metrics.Impressions 0}}<span title="views">👁 {{count .Metrics.Impressions}}</span>{{end}}
+      </div>
+    </div>
+  </div>
+  {{end}}
+</article>
+{{end}}
+
+{{define "mediablock"}}{{if .Media}}<div class="media n{{len .Media}}">
+{{range .Media}}{{if .Unavail}}<div class="unavail">media unavailable</div>{{else if eq .Type "photo"}}<img src="{{.Src}}" alt="{{.AltText}}" loading="lazy"{{if .Width}} width="{{.Width}}" height="{{.Height}}"{{end}}>{{else}}<video controls preload="none"{{if .Poster}} poster="{{.Poster}}"{{end}}><source src="{{.Src}}" type="video/mp4"></video>{{end}}
+{{end}}</div>{{end}}{{end}}
+
+{{define "pollblock"}}{{if .Poll}}<div class="poll">
+{{range .Poll}}<div class="opt"><div class="bar" style="width:{{.Percent}}%"></div><span>{{.Label}}</span><span class="pct">{{.Percent}}%</span></div>
+{{end}}{{if .PollStatus}}<div class="status">{{.PollStatus}}</div>{{end}}</div>{{end}}{{end}}
+
+{{define "quoteblock"}}<div class="quote">
+  <div class="author"><span class="name">{{.AuthorName}}</span> <span class="at">@{{.Handle}}</span></div>
+  <div class="text">{{.HTMLBody}}</div>
+  {{template "mediablock" .}}
+</div>{{end}}
