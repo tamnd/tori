@@ -21,6 +21,8 @@ tori archive karpathy --guest
 tori serve $HOME/data/tori/x/karpathy
 ```
 
+![tori archiving a post into a self-contained folder, summarising it, and serving it back offline](/demo.gif)
+
 ## What it does
 
 - **Captures over the free tiers.** tori reuses the x-cli `x` engine to read X with no API key. Tier 0 syndication needs no setup, `--guest` opens the guest-token tier for deeper paging, and `tori auth import` uses your own session for the rest.
