@@ -6,6 +6,8 @@ weight: 30
 
 This walks the core loop: capture a profile, look at what landed on disk, serve it back, then deepen the capture and keep it up to date.
 
+![tori capturing a post into a self-contained folder, summarising it, listing what landed on disk, and serving it back offline](/demo.gif)
+
 ## 1. Capture a profile
 
 ```bash

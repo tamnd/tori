@@ -7,6 +7,13 @@ weight: 40
 The authoritative, commit-level history lives on the [releases page](https://github.com/tamnd/tori/releases).
 This page summarises each version.
 
+## v0.2.1
+
+Documentation polish.
+
+- **A terminal demo on the docs.** The recorded walk-through of the capture, inspect, and serve loop now runs on the landing page and the [quick start](/getting-started/quick-start/), not just the README.
+- **No code changes.** The binary is identical to v0.2.0; this release exists only to ship the demo and the docs review into a tagged version.
+
 ## v0.2.0
 
 A faster, lighter full-history walk.
