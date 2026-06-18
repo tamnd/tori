@@ -47,6 +47,38 @@ func TestMonthWindowsContiguous(t *testing.T) {
 	}
 }
 
+// TestHybridWindowClamp covers the arithmetic at the heart of the hybrid capture:
+// pass 1 streams the timeline back to some oldest reach, and pass 2 searches only
+// the windows older than that. So clamping the search end to the timeline's oldest
+// date must drop the windows the timeline already covered, and leave none at all
+// when the timeline reached the account's creation (an account under ~3200 posts).
+func TestHybridWindowClamp(t *testing.T) {
+	from := time.Date(2009, 6, 1, 0, 0, 0, 0, time.UTC)
+	now := time.Date(2026, 6, 18, 0, 0, 0, 0, time.UTC)
+	full := monthWindows(from, now)
+
+	// Timeline reached back to 2023-08: search covers only 2009-06 .. 2023-08.
+	reached := time.Date(2023, 8, 12, 0, 0, 0, 0, time.UTC)
+	clamped := monthWindows(from, reached)
+	if len(clamped) >= len(full) {
+		t.Fatalf("clamp did not reduce windows: %d full vs %d clamped", len(full), len(clamped))
+	}
+	// The newest clamped window must not reach past the timeline's oldest month.
+	if clamped[0][1].After(time.Date(2023, 9, 1, 0, 0, 0, 0, time.UTC)) {
+		t.Errorf("clamped search overlaps the timeline beyond its boundary month: %v", clamped[0])
+	}
+
+	// Timeline reached the account's creation month: at most the one boundary month
+	// is left to double-check, not the whole back catalogue.
+	if got := monthWindows(from, from); len(got) > 1 {
+		t.Errorf("timeline back to creation should leave <=1 search window, got %d", len(got))
+	}
+	// Timeline reached before the creation month: search has nothing left to do.
+	if got := monthWindows(from, from.AddDate(0, -1, 0)); len(got) != 0 {
+		t.Errorf("timeline past creation should leave 0 search windows, got %d", len(got))
+	}
+}
+
 func TestIDNewer(t *testing.T) {
 	if !idNewer("100", "99") {
 		t.Error("longer id should be newer")

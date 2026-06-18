@@ -7,6 +7,17 @@ weight: 40
 The authoritative, commit-level history lives on the [releases page](https://github.com/tamnd/tori/releases).
 This page summarises each version.
 
+## v0.2.0
+
+A faster, lighter full-history walk.
+
+- **`--by-month` is now a hybrid two-pass capture.** It streams the profile timeline first, which reads off a different rate limit than search, then walks monthly search windows only for the older history the timeline could not reach.
+The recent window comes off the timeline quota and the older gap comes off search, so a long run leans less on the heavily throttled search surface.
+- **Accounts under the ~3200-post cap cost no search at all.** When the timeline pass reaches the account's creation, the search pass walks zero windows, so a smaller profile is captured entirely from the timeline.
+- **Measured on a real archive.** For [@karpathy](/guides/archiving-a-profile/) (10,118 posts, 9,200 captured back to 2009), the hybrid cuts search-quota page requests by 34% (578 down to 381) and drops 71 of 207 month-windows off the search walk, moving the recent ~3200 posts onto the separate timeline quota.
+- **Honest about the ceiling.** Both surfaces are throttled per account, so for a very prolific account the two passes run in sequence on similar quotas and the single-run wall-clock gain is modest; the win is the search-quota relief and the zero-search capture of anything under the cap.
+- **Tier 0 stays clean.** With no search available, a `--by-month` run keeps the recent timeline window and says the full history needs `--guest` or a session, rather than walking windows it cannot run.
+
 ## v0.1.0
 
 The first release.

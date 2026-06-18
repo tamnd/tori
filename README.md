@@ -96,7 +96,9 @@ tori archive karpathy --guest --with-replies --with-retweets
 ```
 
 X caps a timeline at roughly the last 3200 posts however you page it.
-To reach past that, `--by-month` walks the history in monthly `from:<handle> since:.. until:..` search windows, newest first, from the account's creation to now, and stitches the results into one repository.
+To reach past that, `--by-month` walks the history in monthly `from:<handle> since:.. until:..` search windows and stitches the results into one repository.
+It runs in two passes: it streams the timeline for the recent window first (that reads off a separate rate limit than search), then walks search windows only for the older history the timeline could not reach.
+The two passes share one dedupe set, so a profile that fits under the 3200 cap is captured entirely from the timeline with no search windows at all.
 
 ```bash
 # The whole history, back to the account's first post (import a session first)

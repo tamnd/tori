@@ -28,13 +28,15 @@ Set `--max 0` for as many as the tier will give.
 ## The full history, by month
 
 A profile timeline caps out around 3200 tweets no matter how deep you page.
-To get past that, `--by-month` ignores the timeline and instead walks monthly `from:<handle> since:<date> until:<date>` search windows from the account's creation to now, stitching the results into one archive:
+To get past that, `--by-month` walks monthly `from:<handle> since:<date> until:<date>` search windows, where each window is a separate search the cap never applies to:
 
 ```bash
 tori archive karpathy --by-month --with-replies
 ```
 
-Each window is a separate search, so the cap never applies.
+It does this in two passes.
+First it streams the timeline for the recent window, which reads off a different rate limit than search does, then it walks search windows only for the older history the timeline could not reach.
+The two passes share one dedupe set, so the overlap costs nothing, and an account small enough to fit under the cap is captured entirely from the timeline with no search windows at all.
 A bad window (one that errors) is logged and skipped rather than aborting the whole run.
 
 Two flags make the difference between a partial and a faithful full history.
