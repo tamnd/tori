@@ -19,6 +19,11 @@ import (
 // the record budget (--max) is reached. It is not an error to the caller.
 var errBudget = errors.New("record budget reached")
 
+// errStopTimeline is the sentinel the hybrid timeline pass returns to stop paging
+// once it crosses below the --since floor (the timeline is newest-first, so every
+// later tweet is older). It ends pass 1 cleanly and is not an error to the caller.
+var errStopTimeline = errors.New("timeline reached the since floor")
+
 // Run captures a target into a repository under opts.Out and returns a summary.
 // It is the one entry the CLI's archive/add commands call. The pipeline is:
 // resolve and stream records into the store (writing each as it arrives so a
@@ -280,8 +285,13 @@ func (c *capturer) captureProfile(ctx context.Context, eng *x.Engine, ref string
 	emit := c.emit(res, true)
 
 	if c.opts.ByMonth {
-		// Full history: walk month-wide search windows from the account's creation
-		// to now, which sidesteps the ~3200-tweet timeline cap (spec §7.1).
+		// Full history, hybrid two-pass (spec §7.1). A user timeline caps at roughly
+		// 3200 tweets, so the only free way to the whole history is month-wide
+		// `from:<handle> since:.. until:..` search windows. But search is the scarce
+		// quota. So pass 1 streams the timeline (UserTweets/UserTweetsAndReplies),
+		// which lives on a *separate* rate-limit quota, to grab the dense recent
+		// window cheaply; pass 2 then walks search windows only for the older gap the
+		// timeline could not reach. The shared emit/seen set dedupes the overlap.
 		handle := ref
 		if u != nil && u.Username != "" {
 			handle = u.Username
@@ -299,8 +309,42 @@ func (c *capturer) captureProfile(ctx context.Context, eng *x.Engine, ref string
 		if !c.opts.Until.IsZero() {
 			to = c.opts.Until
 		}
+
+		// Pass 1: the timeline. It pages off a different quota than search, so this
+		// load does not eat into the windows below.
+		fullTo := to
+		tlStart := time.Now()
+		before := res.Added
+		oldest, tlErr := c.timelinePass(ctx, eng, ref, res)
+		switch {
+		case errors.Is(tlErr, errBudget):
+			return u, tlErr
+		case ctx.Err() != nil:
+			return u, ctx.Err()
+		case tlErr != nil && !errors.Is(tlErr, errStopTimeline):
+			// The timeline endpoint failed outright; do not trust its boundary, and
+			// fall back to walking the whole range on search alone.
+			say(c.log, "timeline pass: %v (search will cover the full range)", tlErr)
+			oldest = time.Time{}
+		}
+		if !oldest.IsZero() {
+			say(c.log, "timeline pass: +%d, reached %s in %s", res.Added-before, oldest.Format("2006-01-02"), time.Since(tlStart).Round(time.Second))
+			// Search only needs the gap older than what the timeline reached.
+			if oldest.Before(to) {
+				to = oldest
+			}
+		}
+
+		// Tier 0 has no search; the timeline window is all it can offer.
+		if !eng.CanGraphQL() {
+			res.Note("Tier 0 cannot run search windows; --by-month needs --guest or a session. Captured only the recent timeline window.")
+			return u, nil
+		}
+
+		// Pass 2: search the remaining older windows.
 		windows := monthWindows(from, to)
-		say(c.log, "by-month: walking %d windows from %s", len(windows), from.Format("2006-01"))
+		full := len(monthWindows(from, fullTo))
+		say(c.log, "by-month: %d/%d windows from %s (timeline covered the %d newest)", len(windows), full, from.Format("2006-01"), full-len(windows))
 		for _, w := range windows {
 			if ctx.Err() != nil {
 				return u, ctx.Err()
@@ -332,6 +376,32 @@ func (c *capturer) captureProfile(ctx context.Context, eng *x.Engine, ref string
 		res.Note("Tier 0 returned only the recent timeline window; pass --guest to page deeper, or --by-month for full history.")
 	}
 	return u, err
+}
+
+// timelinePass is pass 1 of the hybrid full-history capture: it streams the user
+// timeline into the store through the shared emit and returns the oldest tweet
+// timestamp it reached, which becomes the upper bound for the search windows.
+// Because the timeline endpoint sits on a different rate-limit quota than search,
+// this captures the dense recent window without spending the search budget the
+// older windows need. It stops early once it pages below the --since floor.
+func (c *capturer) timelinePass(ctx context.Context, eng *x.Engine, ref string, res *Result) (time.Time, error) {
+	var oldest time.Time
+	emit := c.emit(res, true)
+	track := func(t *x.Tweet) error {
+		if t != nil && !t.CreatedAt.IsZero() {
+			if oldest.IsZero() || t.CreatedAt.Before(oldest) {
+				oldest = t.CreatedAt
+			}
+			// Newest-first: once past the --since floor every later tweet is older
+			// too, so stop here and let the (empty) search gap close the run.
+			if !c.opts.Since.IsZero() && t.CreatedAt.Before(c.opts.Since) {
+				return errStopTimeline
+			}
+		}
+		return emit(t)
+	}
+	o := x.TimelineOpts{Replies: c.opts.WithReplies, Media: c.opts.MediaOnly, Limit: c.opts.Max}
+	return oldest, eng.Timeline(ctx, ref, false, o, track)
 }
 
 // monthWindows returns [start,end) month spans from `to` back to `from`,
