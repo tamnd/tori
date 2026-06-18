@@ -12,6 +12,8 @@ It reads X through the free tiers of the [x-cli](https://github.com/tamnd/x-cli)
 
 [Install](#install) • [Quick start](#quick-start) • [Commands](#commands) • [Archive a profile](#archive-a-profile) • [Tiers and auth](#tiers-and-auth) • [How it works](#how-it-works)
 
+![tori archiving a post into a self-contained folder, summarising it, and serving it back offline](docs/static/demo.gif)
+
 You already know the problem.
 A thread you wanted to keep is gone because the account went private, or got suspended, or the author thought better of it at 2am.
 A bookmark resolves to "This post is unavailable."
