@@ -203,8 +203,7 @@ x/karpathy/
 ├── manifest.json             # what was captured, when, which tiers, the range
 ├── state.json                # incremental cursor, for `tori add`
 ├── tweets/
-│   ├── 1234567890.json        # canonical record (source of truth)
-│   └── 1234567890.raw.json    # untouched upstream payload, kept beside it
+│   └── 1234567890.json        # canonical record (source of truth)
 ├── html/1234567890.html       # the inert per-post page
 ├── md/1234567890.md           # the same post as Markdown
 ├── threads/<root>.html        # a reconstructed conversation as one page

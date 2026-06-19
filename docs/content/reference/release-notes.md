@@ -7,6 +7,13 @@ weight: 40
 The authoritative, commit-level history lives on the [releases page](https://github.com/tamnd/tori/releases).
 This page summarises each version.
 
+## v0.2.2
+
+Documentation accuracy.
+
+- **The repository layout now matches what lands on disk.** A pass over every command and flag found the docs and README describing a `tweets/<id>.raw.json` sidecar beside each record, but the engine-backed capture writes only `tweets/<id>.json`, so the raw file was documented and never produced. The tree and the layout notes drop it.
+- **No code changes.** The binary is identical to v0.2.1; this release ships the corrected docs.
+
 ## v0.2.1
 
 Documentation polish.
@@ -31,7 +38,7 @@ The first release.
 tori captures a corner of X into a self-contained folder you can browse with the network unplugged: canonical JSON, the media beside it, and inert HTML and Markdown views that run no code.
 
 - **`tori archive <target>`** captures a profile, a tweet, a thread, a search, a List, or your own likes and bookmarks into a repository at `<out>/x/<slug>`.
-Every tweet is written as `tweets/<id>.json` with its raw payload kept alongside, so the JSON is the source of truth and the views are derived from it.
+Every tweet is written as `tweets/<id>.json`, the source of truth the HTML and Markdown views are derived from.
 - **The full history, not just the recent window.** [`--by-month`](/guides/archiving-a-profile/) walks a profile through monthly `from:<handle>` search windows newest-first, sidestepping the roughly 3200-tweet cap X puts on a plain timeline.
 The acceptance run captured Andrej Karpathy's profile this way.
 - **Three free tiers, no API key.** tori reads X through the x-cli engine: Tier 0 syndication needs no setup, `--guest` opens the guest-token tier for deeper paging, and `tori auth import` uses your own browser session for the rest.
