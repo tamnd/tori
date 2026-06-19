@@ -34,7 +34,27 @@ Full docs and guides live at **[tori.tamnd.com](https://tori.tamnd.com)**.
 go install github.com/tamnd/tori/cmd/tori@latest
 ```
 
-Prefer a prebuilt binary? Grab an archive, a `.deb`/`.rpm`/`.apk`, or a checksum from [releases](https://github.com/tamnd/tori/releases). Or use the container image, which carries tori and nothing else (no browser, no runtime):
+Prefer a prebuilt binary? Grab an archive, a `.deb`/`.rpm`/`.apk`, or a checksum from [releases](https://github.com/tamnd/tori/releases). Or let a package manager handle it:
+
+```bash
+# Homebrew (macOS)
+brew install tamnd/tap/tori
+
+# Scoop (Windows)
+scoop bucket add tamnd https://github.com/tamnd/scoop-bucket
+scoop install tori
+
+# apt (Debian, Ubuntu)
+curl -fsSL https://tamnd.github.io/linux-repo/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/tamnd.gpg
+echo "deb [signed-by=/usr/share/keyrings/tamnd.gpg] https://tamnd.github.io/linux-repo/apt stable main" | sudo tee /etc/apt/sources.list.d/tamnd.list
+sudo apt update && sudo apt install tori
+
+# dnf (Fedora, RHEL)
+sudo dnf config-manager --add-repo https://tamnd.github.io/linux-repo/dnf/tamnd.repo
+sudo dnf install tori
+```
+
+Or use the container image, which carries tori and nothing else (no browser, no runtime):
 
 ```bash
 docker run --rm -v "$PWD/out:/out" ghcr.io/tamnd/tori archive karpathy --guest
