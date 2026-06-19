@@ -1,6 +1,6 @@
 ---
 title: "Installation"
-description: "Install tori from Go, a release archive, a Linux package, or the container image, and add shell completion."
+description: "Install tori from Go, Homebrew, Scoop, a release archive, a Linux package, or the container image, and add shell completion."
 weight: 20
 ---
 
@@ -14,6 +14,22 @@ The only optional secret is your own X session, imported once for Tier 2 (see [t
 go install github.com/tamnd/tori/cmd/tori@latest
 ```
 
+## Homebrew (macOS)
+
+```bash
+brew install tamnd/tap/tori
+```
+
+The cask installs the prebuilt macOS binary. On Linux, use the packages below or
+`go install`.
+
+## Scoop (Windows)
+
+```bash
+scoop bucket add tamnd https://github.com/tamnd/scoop-bucket
+scoop install tori
+```
+
 ## Release archives and Linux packages
 
 Every [release](https://github.com/tamnd/tori/releases) attaches `tar.gz` archives (and a `.zip` for Windows) for Linux, macOS, Windows, and FreeBSD, plus `.deb`, `.rpm`, and `.apk` packages and a `checksums.txt`.
@@ -21,10 +37,10 @@ Download the one for your platform, extract `tori`, and put it on your `PATH`.
 
 ```bash
 # Debian/Ubuntu
-sudo dpkg -i tori_*_linux_amd64.deb
+sudo dpkg -i tori_*_amd64.deb
 
 # Fedora/RHEL
-sudo rpm -i tori_*_linux_amd64.rpm
+sudo rpm -i tori-*.x86_64.rpm
 ```
 
 ## Container

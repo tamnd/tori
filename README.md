@@ -34,7 +34,18 @@ Full docs and guides live at **[tori.tamnd.com](https://tori.tamnd.com)**.
 go install github.com/tamnd/tori/cmd/tori@latest
 ```
 
-Prefer a prebuilt binary? Grab an archive, a `.deb`/`.rpm`/`.apk`, or a checksum from [releases](https://github.com/tamnd/tori/releases). Or use the container image, which carries tori and nothing else (no browser, no runtime):
+Prefer a prebuilt binary? Grab an archive, a `.deb`/`.rpm`/`.apk`, or a checksum from [releases](https://github.com/tamnd/tori/releases). On a Mac or Windows box, the package managers know it:
+
+```bash
+# Homebrew (macOS)
+brew install tamnd/tap/tori
+
+# Scoop (Windows)
+scoop bucket add tamnd https://github.com/tamnd/scoop-bucket
+scoop install tori
+```
+
+Or use the container image, which carries tori and nothing else (no browser, no runtime):
 
 ```bash
 docker run --rm -v "$PWD/out:/out" ghcr.io/tamnd/tori archive karpathy --guest
