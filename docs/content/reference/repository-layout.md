@@ -29,8 +29,7 @@ A profile capture of `karpathy` looks like this:
 ```
 $HOME/data/tori/x/karpathy/
 ├── tweets/                  # canonical records, the source of truth
-│   ├── 1745...json          # tweets/<id>.json, one per tweet
-│   └── 1745...raw.json      # the untouched upstream payload, beside it
+│   └── 1745...json          # tweets/<id>.json, one per tweet
 ├── html/                    # rendered inert per-tweet pages
 │   └── 1745...html
 ├── threads/                 # reconstructed conversations
@@ -54,7 +53,7 @@ $HOME/data/tori/x/karpathy/
 
 Key points:
 
-- **JSON is the source of truth.** Each tweet is `tweets/<id>.json`, written the instant it arrives. The id is a snowflake string used verbatim, so the path is a pure function of the id and a re-capture overwrites the same file. A `.raw.json` sits beside it with the untouched upstream payload.
+- **JSON is the source of truth.** Each tweet is `tweets/<id>.json`, written the instant it arrives. The id is a snowflake string used verbatim, so the path is a pure function of the id and a re-capture overwrites the same file.
 - **Views are derived.** `html/`, `md/`, `threads/`, `index.html`, and `README.md` are all rebuilt from the JSON by the renderer. Delete them and `tori render <repo>` recreates them with no network.
 - **Media is localised and deduped.** Files go under `media/<type>/`, named by the media key plus a short hash of the source URL. Two renditions never collide, and one photo shared across many tweets resolves to a single file.
 - **A standalone tweet versus a thread.** A tweet with no surrounding conversation is rendered as a single page (`html/<id>.html`, `md/<id>.md`); a multi-tweet conversation is rendered as one page under `threads/`.
