@@ -122,6 +122,7 @@ scoops:
       owner: tamnd
       name: scoop-bucket
       token: '{{ .Env.SCOOP_BUCKET_GITHUB_TOKEN }}'
+    directory: bucket
     homepage: https://github.com/tamnd/tori
     description: Build offline, browsable archives of X (Twitter) content
     license: AGPL-3.0-only
